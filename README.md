@@ -130,7 +130,7 @@ Zuerich ist signifikant teurer als Basel, Bern, Biel, Lausanne, Lugano, Luzern, 
 | Name | GitHub |
 |---|---|
 | Basil Haerri | [@haerrbas](https://github.com/haerrbas) |
-| Student 2 | (tbd) |
+| Sandro Schmuki | [@schmusan](https://github.com/schmusan) |
 
 ---
 
