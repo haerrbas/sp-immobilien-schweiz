@@ -1,5 +1,5 @@
 """
-streamlit_app.py — Interaktive Web App Schweizer Immobilienpreise
+streamlit_app.py — Interaktive Web App Swiss Real Estate Prices
 Starten: streamlit run app/streamlit_app.py
 """
 import sys; sys.path.insert(0, '.')
@@ -9,7 +9,7 @@ import scipy.stats as stats
 from pathlib import Path
 from itertools import combinations
 
-st.set_page_config(page_title="Schweizer Immobilienpreise", page_icon="home", layout="wide")
+st.set_page_config(page_title="Swiss Real Estate Prices", page_icon="home", layout="wide")
 
 @st.cache_data
 def lade_daten():
@@ -22,41 +22,41 @@ def lade_daten():
     return df
 
 df = lade_daten()
-st.title("Schweizer Immobilienpreise")
-st.markdown("Interactive analysis of rental apartment listings - SP-Projekt FS2026")
+st.title("Swiss Real Estate Prices")
+st.markdown("Interactive analysis of rental apartment listings - SP Project FS2026")
 st.divider()
 
 with st.sidebar:
     st.header("Filter")
     staedte_all = sorted(df['stadt'].dropna().unique())
-    staedte_sel = st.multiselect("Staedte", staedte_all, default=staedte_all)
-    p_min, p_max = st.slider("Preis (CHF/Mt.)", int(df['preis_chf'].min()), int(df['preis_chf'].max()),
+    staedte_sel = st.multiselect("Cities", staedte_all, default=staedte_all)
+    p_min, p_max = st.slider("Price (CHF/mo.)", int(df['preis_chf'].min()), int(df['preis_chf'].max()),
         (int(df['preis_chf'].quantile(0.05)), int(df['preis_chf'].quantile(0.95))))
-    z_min, z_max = st.slider("Zimmer", float(df['zimmer_anzahl'].min()), float(df['zimmer_anzahl'].max()), (1.0,5.0), step=0.5)
+    z_min, z_max = st.slider("Rooms", float(df['zimmer_anzahl'].min()), float(df['zimmer_anzahl'].max()), (1.0,5.0), step=0.5)
 
 dff = df[df['stadt'].isin(staedte_sel) & df['preis_chf'].between(p_min,p_max) & df['zimmer_anzahl'].between(z_min,z_max)]
 
 c1,c2,c3,c4 = st.columns(4)
-c1.metric("Inserate", f"{len(dff):,}")
-c2.metric("Preis (Ø)", f"CHF {dff['preis_chf'].mean():,.0f}" if len(dff) else "n/a")
-c3.metric("Flaeche (Ø)", f"{dff['flaeche_m2'].mean():.0f} m2" if len(dff) else "n/a")
-c4.metric("Staedte", f"{dff['stadt'].nunique()}")
+c1.metric("Listings", f"{len(dff):,}")
+c2.metric("Price (avg)", f"CHF {dff['preis_chf'].mean():,.0f}" if len(dff) else "n/a")
+c3.metric("Area (avg)", f"{dff['flaeche_m2'].mean():.0f} m2" if len(dff) else "n/a")
+c4.metric("Cities", f"{dff['stadt'].nunique()}")
 st.divider()
 
-tab1,tab2,tab3,tab4 = st.tabs(["Uebersicht","Analyse","Daten","Statistik"])
+tab1,tab2,tab3,tab4 = st.tabs(["Overview","Analysis","Data","Statistics"])
 
 with tab1:
     col1,col2 = st.columns(2)
     with col1:
-        st.subheader("Preisverteilung nach Stadt")
+        st.subheader("Price Distribution by City")
         if len(dff) > 0:
             fig,ax = plt.subplots(figsize=(7,4))
             order = dff.groupby('stadt')['preis_chf'].median().sort_values(ascending=False).index
             sns.boxplot(data=dff, y='stadt', x='preis_chf', order=order, palette='husl', ax=ax)
-            ax.set_xlabel("CHF/Monat"); ax.set_ylabel("")
+            ax.set_xlabel("CHF/month"); ax.set_ylabel("")
             plt.tight_layout(); st.pyplot(fig)
     with col2:
-        st.subheader("Preis/m2 nach Stadt")
+        st.subheader("Price/m2 by City")
         if len(dff) > 0:
             fig,ax = plt.subplots(figsize=(7,4))
             pm2 = dff.groupby('stadt')['preis_pro_m2'].mean().sort_values()
@@ -67,7 +67,7 @@ with tab1:
 with tab2:
     col1,col2 = st.columns(2)
     with col1:
-        st.subheader("Flaeche vs. Mietpreis")
+        st.subheader("Area vs. Rental Price")
         if len(dff) > 5:
             fig,ax = plt.subplots(figsize=(7,5))
             for s in dff['stadt'].unique():
@@ -80,7 +80,7 @@ with tab2:
             ax.legend(fontsize=8,ncol=2); ax.set_xlabel("m2"); ax.set_ylabel("CHF")
             plt.tight_layout(); st.pyplot(fig)
     with col2:
-        st.subheader("Preis nach Zimmergruppe")
+        st.subheader("Price by Room Group")
         if len(dff) > 0:
             fig,ax = plt.subplots(figsize=(7,5))
             zo = [z for z in ['1-1.5 Zi','2-2.5 Zi','3-3.5 Zi','4+ Zi'] if z in dff['zimmer_gruppe'].values]
@@ -88,18 +88,18 @@ with tab2:
             plt.tight_layout(); st.pyplot(fig)
 
 with tab3:
-    st.subheader("Zusammenfassende Tabelle")
+    st.subheader("Summary Table")
     if len(dff) > 0:
         t = dff.groupby('stadt').agg(n=('preis_chf','count'),preis=('preis_chf','mean'),
             median=('preis_chf','median'),flaeche=('flaeche_m2','mean'),
             zimmer=('zimmer_anzahl','mean'),m2=('preis_pro_m2','mean')).round(1)
-        t.columns=['n','Preis (CHF)','Median','Flaeche (m2)','Zimmer','CHF/m2']
+        t.columns=['n','Preis (CHF)','Median','Area (m2)','Rooms','CHF/m2']
         st.dataframe(t.sort_values('Preis (CHF)',ascending=False),use_container_width=True)
-    st.subheader("Rohdaten")
+    st.subheader("Raw Data")
     st.dataframe(dff.head(100),use_container_width=True)
 
 with tab4:
-    st.subheader("Korrelationsanalyse (Pearson r + p-Wert)")
+    st.subheader("Correlation Analysis (Pearson r + p-value)")
     num_cols = ['preis_chf','flaeche_m2','zimmer_anzahl','preis_pro_m2']
     dn = dff[num_cols].dropna()
     if len(dn) > 5:
