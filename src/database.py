@@ -1,7 +1,7 @@
 """
 database.py
 -----------
-SQLite-Datenbanklogik fuer das Immobilienprojekt.
+SQLite database logic fuer das Immobilienprojekt.
 Speichert und liest Inserate via SQLAlchemy + raw SQL-Queries.
 """
 
@@ -17,7 +17,7 @@ DB_PATH = Path("data/immobilien.db")
 
 class ImmobilienDB:
     """
-    Verwaltet die SQLite-Datenbank fuer Immobilieninserate.
+    Manages the SQLite database fuer Immobilieninserate.
     Demonstriert: CREATE, INSERT, SELECT mit SQL-Queries.
     """
 

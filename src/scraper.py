@@ -127,10 +127,10 @@ class ImmobilienScraper:
         for stadt in staedte:
             alle.extend(self.scrape_flatfox(stadt, max_seiten=2))
         if not alle and fallback_auf_beispiel:
-            print("Keine echten Daten - Verwende Beispieldaten.")
+            print("No real data available - Using sample data.")
             alle = self.generiere_beispieldaten(n_beispiel)
         elif len(alle) < 50 and fallback_auf_beispiel:
             alle.extend(self.generiere_beispieldaten(n_beispiel))
         df = pd.DataFrame([ins.to_dict() for ins in alle if ins.ist_valide()])
-        print(f"Gesamtergebnis: {len(df)} Inserate als DataFrame")
+        print(f"Total result: {len(df)} Inserate als DataFrame")
         return df

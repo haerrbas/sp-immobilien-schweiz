@@ -1,9 +1,9 @@
 """
 models.py
 ---------
-OOP-Datenmodelle fuer das Immobilienprojekt.
-Definiert die Klasse `Inserat` zur strukturierten Speicherung
-eines Immobilieninserats.
+OOP data models for the real estate project.
+Defines the class `Inserat` for structured storage
+of a real estate listing.
 """
 
 from dataclasses import dataclass, field
@@ -14,8 +14,8 @@ import re
 @dataclass
 class Inserat:
     """
-    Repraesentiert ein einzelnes Immobilieninserat.
-    Verwendet Python dataclass fuer saubere OOP-Struktur.
+    Represents a single real estate listing.
+    Uses Python dataclass fuer saubere OOP-Struktur.
     """
     titel: str
     preis_raw: str
@@ -55,14 +55,14 @@ class Inserat:
         return float(match.group(1).replace(",", ".")) if match else None
 
     def _parse_zimmer(self, raw: str) -> Optional[float]:
-        """Extrahiert Zimmeranzahl via Regex. Bsp: '3.5 Zimmer' -> 3.5"""
+        """Extracts number of rooms via Regex. Bsp: '3.5 Zimmer' -> 3.5"""
         if not raw:
             return None
         match = re.search(r"(\\d+(?:[.,]\\d+)?)", raw)
         return float(match.group(1).replace(",", ".")) if match else None
 
     def _parse_ort(self, raw: str) -> tuple:
-        """Trennt PLZ und Stadtname via Regex. Bsp: '8001 Zuerich' -> ('8001', 'Zuerich')"""
+        """Separates ZIP code and city name via Regex. Bsp: '8001 Zuerich' -> ('8001', 'Zuerich')"""
         if not raw:
             return None, None
         match = re.match(r"(\\d{4})\\s+([^\\,]+)", raw.strip())
