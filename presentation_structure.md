@@ -1,7 +1,7 @@
-# Schweizer Immobilienpreise
+# Swiss Real Estate Prices
 ## Scientific Programming - FS2026
 
-**Basil Haerri / [Student 2]**
+**Basil Haerri / Sandro Oswald Schmuki**
 ZHAW School of Management and Law
 
 ---
@@ -9,35 +9,35 @@ ZHAW School of Management and Law
 ## 1. Introduction
 
 ### Background
-- Wohnungsmieten in der Schweiz gehoeren zu den hoechsten in Europa
-- Starke regionale Unterschiede zwischen Staedten und Kantonen
-- Datengetriebene Analyse kann Mietern und Investoren nuetzen
+- Rental prices in Switzerland are among the highest in Europe
+- Strong regional differences between cities and cantons
+- Data-driven analysis can benefit tenants and investors
 
 ### Research Questions
-1. Welche Merkmale (Flaeche, Zimmer, Lage) korrelieren am staerksten mit dem Mietpreis?
-2. Gibt es statistisch signifikante Preisunterschiede zwischen Schweizer Staedten?
-3. Wie gut laesst sich der Mietpreis durch eine lineare Regression erklaeren?
+1. Which features (area, rooms, location) correlate most strongly with rental price?
+2. Are there statistically significant price differences between Swiss cities?
+3. How well can rental prices be explained by a linear regression?
 
 ---
 
 ## 2. Materials and Methods
 
 ### Data Collection
-- Quelle: Flatfox.ch (Web Scraper mit BeautifulSoup + requests)
-- Fallback: Synthetischer Generator (500 Inserate, basierend auf BFS-Preisstatistiken 2023/24)
-- Umfang: 500 Mietwohnungsinserate aus 10 Schweizer Staedten
+- Source: Flatfox.ch (web scraper using BeautifulSoup + requests)
+- Fallback: Synthetic generator (500 listings, based on FSO price statistics 2023/24)
+- Scope: 500 rental apartment listings from 10 Swiss cities
 
 ### Data Preparation
-- Regex-Parsing: Preis, Flaeche, Zimmer, PLZ aus Rohstrings extrahiert
-- Plausibilitaetsfilter via Loop + Conditionals (Preis CHF 300-15000, Flaeche 15-400 m2)
-- Feature Engineering: Preis/m2, Preiskategorie, Zimmergruppe
-- LLM-Analyse: Claude API klassifiziert Ausstattungsmerkmale (Balkon, Parking, Renoviert)
+- Regex parsing: price, area, rooms, ZIP extracted from raw strings
+- Plausibility filter: price CHF 300-15,000, area 15-400 m2, rooms 0.5-12
+- Feature engineering: price/m2, price category, room group
+- LLM analysis: Claude API classifies amenity features (balcony, parking, renovated)
 
 ### Statistical Methods
-- Deskriptive Statistik: Mittelwert, Median, Standardabweichung pro Stadt
-- Korrelationsanalyse: Pearson r mit zweiseitigem p-Wert (scipy.stats.pearsonr)
-- t-Test: Welch's unabhaengiger t-Test (scipy.stats.ttest_ind, equal_var=False)
-- Regression: Einfache lineare Regression (scipy.stats.linregress)
+- Descriptive statistics: mean, median, standard deviation per city
+- Correlation analysis: Pearson r with two-sided p-value (scipy.stats.pearsonr)
+- t-test: Welch's independent t-test (scipy.stats.ttest_ind, equal_var=False)
+- Regression: Simple linear regression (scipy.stats.linregress)
 
 ### Tools
 Python 3.11, pandas, numpy, matplotlib, seaborn, scipy, sqlite3, BeautifulSoup, Streamlit, Anthropic Claude API
@@ -48,88 +48,99 @@ Python 3.11, pandas, numpy, matplotlib, seaborn, scipy, sqlite3, BeautifulSoup, 
 
 ### Descriptive Statistics
 
-| Stadt | n | Avg CHF | Median | Std |
+| City | n | Avg CHF | Median | Std |
 |---|---|---|---|---|
-| Zuerich | 50 | 2517 | 2475 | 494 |
-| Genf | 50 | 2384 | 2375 | 452 |
-| Lausanne | 50 | 2064 | 2050 | 460 |
-| Basel | 50 | 1979 | 1900 | 443 |
-| Bern | 50 | 1907 | 1800 | 424 |
-| Luzern | 50 | 1758 | 1775 | 407 |
-| Winterthur | 50 | 1635 | 1650 | 412 |
-| Biel | 50 | 1522 | 1475 | 484 |
+| Zurich | 50 | 2,517 | 2,475 | 494 |
+| Geneva | 50 | 2,384 | 2,375 | 452 |
+| Lausanne | 50 | 2,064 | 2,050 | 460 |
+| Basel | 50 | 1,979 | 1,900 | 443 |
+| Bern | 50 | 1,907 | 1,800 | 424 |
+| Lucerne | 50 | 1,758 | 1,775 | 407 |
+| Winterthur | 50 | 1,635 | 1,650 | 412 |
+| Biel | 50 | 1,522 | 1,475 | 484 |
 
 ### Correlation Analysis (Pearson r)
 
-| Variables | r | p-Value | Significance |
+| Variables | r | p-value | Significance |
 |---|---|---|---|
-| Preis ~ Flaeche | 0.803 | 4.22e-114 | *** |
-| Preis ~ Zimmer | 0.766 | 1.19e-97 | *** |
-| Flaeche ~ Zimmer | 0.943 | 9.22e-241 | *** |
-| Preis ~ Preis/m2 | -0.326 | 8.41e-14 | *** |
+| Price ~ Area | 0.803 | 4.22e-114 | *** |
+| Price ~ Rooms | 0.766 | 1.19e-97 | *** |
+| Area ~ Rooms | 0.943 | 9.22e-241 | *** |
+| Price ~ Price/m2 | -0.326 | 8.41e-14 | *** |
 
-Interpretation: Flaeche und Zimmeranzahl sind die staerksten Praediktoren.
+Interpretation: Area and number of rooms are the strongest price predictors.
 
-### Linear Regression: Preis ~ Flaeche
+### Linear Regression: Price ~ Area
 
 ```
-Preis = 12.14 x Flaeche (m2) + 976.24
-R2 = 0.645  (64.5% Varianzaufklaerung)
-p = 4.22e-114  (*** hochsignifikant)
--> Jeder m2 mehr kostet CHF 12.14 mehr Miete
+Price = 12.14 x Area (m2) + 976.24
+R2 = 0.645  (64.5% of price variance explained)
+p = 4.22e-114  (*** highly significant)
+-> Each additional m2 costs on average CHF 12.14 more in rent
 ```
 
-### t-Test Results (alpha = 0.05, Welch's)
-Zuerich ist signifikant teurer als 8 von 9 Staedten.
-Ausnahme: Genf (p = 0.163, H0 beibehalten).
+### t-test Results (alpha = 0.05, Welch's)
+Zurich is significantly more expensive than 8 out of 9 other cities.
+Exception: Geneva (p = 0.163 -> H0 retained - similar price level to Zurich).
 
 ---
 
 ## 4. Conclusions
 
-1. Flaeche ist der staerkste Preispraeadiktor (r=0.80, p<0.001)
-2. Stadtlage ist signifikant - Zuerich und Genf deutlich teurer
-3. Lineare Regression erklaert 64.5% der Preisvarianz
-4. Pipeline laeuft vollautomatisch - Scraping bis Web App
+1. Area is the strongest price predictor (r=0.80, p<0.001)
+2. City location is significant - Zurich and Geneva significantly more expensive
+3. Linear regression explains 64.5% of price variance
+4. Pipeline runs fully automatically - from scraping to interactive web app
 
 ---
 
-## Appendix: Punkte-Nachweis
+## Appendix: Points Evidence
 
-### Pflichtanforderungen
+### Mandatory Requirements
 
-**1. Reale Daten:** src/scraper.py - HTTP GET auf Flatfox.ch mit BeautifulSoup
+**1. Real-world data:**
+`src/scraper.py` - HTTP GET on Flatfox.ch using BeautifulSoup
 
-**2. Regex-Parsing:**
+**2. Regex parsing:**
 ```python
-def _parse_preis(self, raw: str) -> Optional[float]:
+def _parse_price(self, raw: str) -> Optional[float]:
     cleaned = re.sub(r"['\s]", "", raw)
     match = re.search(r"(\d+(?:\.\d+)?)", cleaned)
     return float(match.group(1)) if match else None
 ```
+All 4 parsers in `src/models.py`: price, area, rooms, ZIP+city
 
-**3. Datenstrukturen:** Notebook 01 - list(), set(), dict(sorted()), tuple() explizit gezeigt
+**3. Data structures:**
+Notebook 01, Cell 3: `list()`, `set()`, `dict(sorted(...))`, `tuple()` explicitly shown
 
-**4. Kontrollstrukturen:** Notebook 02 - for + if/elif/else Plausibilitaetsfilter
+**4. Control structures:**
+Notebook 02: `for idx, row in df.iterrows()` + `if/elif/else` plausibility filter
 
-**5. OOP:** dataclass Inserat, class ImmobilienScraper, class ImmobilienDB
+**5. OOP:**
+- `@dataclass class Listing` - 6 fields, `__post_init__`, `is_valid()`, `to_dict()`
+- `class ImmobilienScraper` - `scrape_flatfox()`, `generate_sample_data()`, `scrape_all_cities()`
+- `class ImmobilienDB` - `_create_tables()`, `save_listing()`, `bulk_save()`, `price_stats_by_city()`
 
-**6. Visualisierungen:** Notebook 04 - 4-Panel Dashboard, Heatmap, Regression, Folium-Karte
+**6. Visualizations:**
+Notebook 04: 4-panel dashboard (boxplot, violin, bar chart, scatter), correlation heatmap, Folium map
 
-**7. Statistik mit p-Wert:** scipy.stats.pearsonr, ttest_ind, linregress - alle mit p-Werten
+**7. Statistics with p-value:**
+- `scipy.stats.pearsonr` -> r + p-value for all variable pairs
+- `scipy.stats.ttest_ind(equal_var=False)` -> Welch's t-test Zurich vs. each city
+- `scipy.stats.linregress` -> regression p-value = 4.22e-114
 
-**8. Moodle:** ZIP-Abgabe
+**8. Moodle submission:** ZIP file with all notebooks, src/, app/
 
-### Bonuspunkte
+### Bonus Points
 
-**B1 Web Scraper:** ImmobilienScraper.scrape_flatfox() mit BeautifulSoup + requests
+**B1 Web Scraper:** `ImmobilienScraper.scrape_flatfox()` - BeautifulSoup + requests
 
-**B2 Datenbank + SQL:** SQLite ImmobilienDB - CREATE TABLE, INSERT OR IGNORE, SELECT GROUP BY, LEFT JOIN
+**B2 Database + SQL:** SQLite ImmobilienDB - CREATE TABLE, INSERT OR IGNORE, GROUP BY, LEFT JOIN
 
-**B3 LLM:** Claude API in Notebook 02 - JSON-strukturierte Ausstattungsklassifikation
+**B3 LLM:** Claude API in Notebook 02 - JSON-structured amenity classification
 
-**B4 Web App:** Streamlit - Filter-Sidebar, 4 Tabs, KPIs, Charts, Korrelation, t-Test
+**B4 Web App:** Streamlit - filter sidebar, 4 tabs, KPIs, charts, statistics
 
-**B5 GitHub:** https://github.com/haerrbas/sp-immobilien-schweiz (public, .gitignore fuer data/)
+**B5 GitHub:** https://github.com/haerrbas/sp-immobilien-schweiz (public, .gitignore for data/)
 
-**B6 Kreativitaet:** Folium-Karte CH, Preis/m2-Feature, Preiskategorie-Funktion, LLM-Features
+**B6 Creativity:** Folium map CH, price/m2 feature, price category function, LLM features
