@@ -23,7 +23,7 @@ def lade_daten():
 
 df = lade_daten()
 st.title("Schweizer Immobilienpreise")
-st.markdown("Interaktive Analyse von Mietwohnungsinseraten - SP-Projekt FS2026")
+st.markdown("Interactive analysis of rental apartment listings - SP-Projekt FS2026")
 st.divider()
 
 with st.sidebar:
